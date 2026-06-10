@@ -1,0 +1,17 @@
+# Secrets
+.env
+.env.local
+.env.*.local
+ 
+# Go
+server/bin/
+server/tmp/
+ 
+# Node
+client/node_modules/
+client/dist/
+client/.vite/
+ 
+# OS 
+.DS_Store
+
