@@ -17,4 +17,5 @@ React + Typescript + Shadcn + Tailwind
 PostgreSQL in a docker container
 
 ### Infrastructure
+
 Docker + Docker compose
