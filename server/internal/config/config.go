@@ -130,4 +130,3 @@ func (c *Config) validate() error {
 func (c *Config) IsDevelopment() bool {
 	return c.App.Env == "development"
 }
-

@@ -16,8 +16,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Connect to the database
+	if err := config.ConnectDB(cfg); err != nil {
+		fmt.Fprintf(os.Stderr, "database error: %v\n", err)
+		os.Exit(1)
+	}
+	defer config.DB.Close()
+
 	server := gin.Default()
-	server.Run()
 
 	log.Printf("server listening on port %s", cfg.Server.Port)
+	server.Run(":" + cfg.Server.Port)
 }
