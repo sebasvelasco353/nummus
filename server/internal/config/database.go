@@ -8,7 +8,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// DB is the global database connection pool.
 var DB *sql.DB
 
 // opens a connection.
