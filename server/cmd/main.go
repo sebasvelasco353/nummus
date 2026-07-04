@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sebasvelasco353/nummus/server/internal/config"
+	"github.com/sebasvelasco353/nummus/server/internal/users"
 )
 
 func main() {
@@ -24,6 +25,7 @@ func main() {
 	defer config.DB.Close()
 
 	server := gin.Default()
+	users.RegisterRoutes(server)
 
 	log.Printf("server listening on port %s", cfg.Server.Port)
 	server.Run(":" + cfg.Server.Port)
