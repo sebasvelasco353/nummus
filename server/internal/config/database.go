@@ -10,7 +10,6 @@ import (
 
 var DB *sql.DB
 
-// opens a connection.
 func ConnectDB(cfg *Config) error {
 	connStr := cfg.DB.DBAddress()
 

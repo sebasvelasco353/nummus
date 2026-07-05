@@ -5,5 +5,5 @@ import (
 )
 
 func RegisterRoutes(server *gin.Engine) {
-	server.GET("/users", getUserById)
+	server.POST("/signup", signUp)
 }
