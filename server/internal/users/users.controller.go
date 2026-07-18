@@ -1,14 +1,11 @@
 package users
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 )
 
 func signUp(context *gin.Context) {
 	// TODO: add validation for the user input
-	// TODO: add logic to save the user to the database
 	var user User
 
 	if err := context.ShouldBindJSON(&user); err != nil {
@@ -18,8 +15,26 @@ func signUp(context *gin.Context) {
 		return
 	}
 
-	fmt.Println("User:", user)
+	result, err := user.SignUp()
+	if err != nil {
+		context.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
 	context.JSON(200, gin.H{
-		"message": "Sign Up",
+		"message": "Success, user created with ID: " + result,
 	})
+}
+
+func login(context *gin.Context) {
+	var user User
+
+	if err := context.ShouldBindJSON(&user); err != nil {
+		context.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 }
