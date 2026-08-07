@@ -9,12 +9,12 @@ import (
 )
 
 var DB *sql.DB
+var err error
 
-// opens a connection.
 func ConnectDB(cfg *Config) error {
 	connStr := cfg.DB.DBAddress()
 
-	DB, err := sql.Open("postgres", connStr)
+	DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		return fmt.Errorf("failed to open database: %w", err)
 	}
