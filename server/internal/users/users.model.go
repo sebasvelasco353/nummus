@@ -1,8 +1,6 @@
 package users
 
 import (
-	"fmt"
-
 	"github.com/sebasvelasco353/nummus/server/internal/config"
 	"github.com/sebasvelasco353/nummus/server/internal/utils"
 )
@@ -13,6 +11,12 @@ type User struct {
 	Password string `binding:"required"`
 	Name     string `binding:"required"`
 	LastName string
+}
+
+type UserLogin struct {
+	ID       string
+	Email    string `binding:"required"`
+	Password string `binding:"required"`
 }
 
 func (u User) SignUp() (string, error) {
@@ -28,8 +32,23 @@ func (u User) SignUp() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("New user ID:", newUserId)
 	u.ID = newUserId
-	fmt.Println("Signing up user:", u.ID)
 	return u.ID, nil
+}
+
+func (u UserLogin) Login() (string, error) {
+	var fetchedUser UserLogin
+	var err error
+
+	query := "SELECT user_id, password FROM users WHERE email = $1"
+	err = config.DB.QueryRow(query, u.Email).Scan(&fetchedUser.ID, &fetchedUser.Password)
+	if err != nil {
+		return "", err
+	}
+
+	err = utils.ComparePassword(u.Password, fetchedUser.Password)
+	if err != nil {
+		return "", err
+	}
+	return fetchedUser.ID, nil
 }

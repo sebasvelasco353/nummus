@@ -29,7 +29,8 @@ func signUp(context *gin.Context) {
 }
 
 func login(context *gin.Context) {
-	var user User
+	// TODO: Add JWT token generation functionality
+	var user UserLogin
 
 	if err := context.ShouldBindJSON(&user); err != nil {
 		context.JSON(400, gin.H{
@@ -37,4 +38,15 @@ func login(context *gin.Context) {
 		})
 		return
 	}
+	result, err := user.Login()
+	if err != nil {
+		context.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	context.JSON(200, gin.H{
+		"message": "Success, user logged in with ID: " + result,
+	})
 }
