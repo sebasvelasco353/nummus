@@ -45,6 +45,8 @@ type ServerConfig struct {
 	JWTExpiryHours string
 }
 
+var ServerCfg ServerConfig
+
 func Load() (*Config, error) {
 	env := os.Getenv("APP_ENV")
 	if env == "" {
@@ -94,6 +96,7 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
+	ServerCfg = cfg.Server
 	return cfg, nil
 }
 

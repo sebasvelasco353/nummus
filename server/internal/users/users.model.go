@@ -1,6 +1,8 @@
 package users
 
 import (
+	"fmt"
+
 	"github.com/sebasvelasco353/nummus/server/internal/config"
 	"github.com/sebasvelasco353/nummus/server/internal/utils"
 )
@@ -40,8 +42,8 @@ func (u UserLogin) Login() (string, error) {
 	var fetchedUser UserLogin
 	var err error
 
-	query := "SELECT user_id, password FROM users WHERE email = $1"
-	err = config.DB.QueryRow(query, u.Email).Scan(&fetchedUser.ID, &fetchedUser.Password)
+	query := "SELECT user_id, email, password FROM users WHERE email = $1"
+	err = config.DB.QueryRow(query, u.Email).Scan(&fetchedUser.ID, &fetchedUser.Email, &fetchedUser.Password)
 	if err != nil {
 		return "", err
 	}
@@ -50,5 +52,12 @@ func (u UserLogin) Login() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	newToken, err := utils.GenerateToken(fetchedUser.Email, fetchedUser.ID)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(newToken)
+
 	return fetchedUser.ID, nil
 }
