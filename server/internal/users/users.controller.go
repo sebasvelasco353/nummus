@@ -1,6 +1,8 @@
 package users
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -49,4 +51,8 @@ func login(context *gin.Context) {
 	context.JSON(200, gin.H{
 		"message": "Success, user logged in with ID: " + result,
 	})
+}
+
+func refresh(context *gin.Context) {
+	fmt.Println("Refresh the token")
 }

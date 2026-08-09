@@ -20,3 +20,13 @@ func GenerateToken(email string, userId string) (string, error) {
 	})
 	return token.SignedString([]byte(config.ServerCfg.JWTSecret))
 }
+
+// TODO: Add token validation utility
+func ValidateToken(token string) (bool, error) {
+	return false, nil
+}
+
+// TODO: Add Token refresh utility
+func RefreshToken(token string) (string, error) {
+	return "", nil
+}
