@@ -9,6 +9,7 @@ import (
 	"github.com/sebasvelasco353/nummus/server/internal/config"
 )
 
+// generates a new signed JWT token
 func GenerateAccessToken(email string, userId string) (string, error) {
 	expHours, err := strconv.ParseInt(config.ServerCfg.JWTExpiryHours, 10, 64)
 	if err != nil {
@@ -22,6 +23,7 @@ func GenerateAccessToken(email string, userId string) (string, error) {
 	return token.SignedString([]byte(config.ServerCfg.JWTSecret))
 }
 
+// creates a new random string with high entropy
 func GenerateRefreshToken() string {
 	return rand.Text()
 }
