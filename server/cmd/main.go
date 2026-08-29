@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -27,6 +26,5 @@ func main() {
 	server := gin.Default()
 	users.RegisterRoutes(server)
 
-	log.Printf("server listening on port %s", cfg.Server.Port)
 	server.Run(":" + cfg.Server.Port)
 }

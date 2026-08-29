@@ -1,8 +1,10 @@
 package users
 
 import (
-	"fmt"
+	"strconv"
+	"time"
 
+	"github.com/sebasvelasco353/nummus/server/internal/auth"
 	"github.com/sebasvelasco353/nummus/server/internal/config"
 	"github.com/sebasvelasco353/nummus/server/internal/utils"
 )
@@ -21,12 +23,19 @@ type UserLogin struct {
 	Password string `binding:"required"`
 }
 
+type loginResult struct {
+	UserId              string
+	AccessToken         string
+	RefreshToken        string
+	RefreshTokenExpDate time.Time
+}
+
 func (u User) SignUp() (string, error) {
 	var err error
 	var newUserId string
 
 	query := "INSERT INTO users (email, password, name, last_name) VALUES ($1, $2, $3, $4) RETURNING user_id"
-	u.Password, err = utils.HashPassword(u.Password)
+	u.Password, err = auth.HashPassword(u.Password)
 	if err != nil {
 		return "", err
 	}
@@ -38,26 +47,40 @@ func (u User) SignUp() (string, error) {
 	return u.ID, nil
 }
 
-func (u UserLogin) Login() (string, error) {
+func (u UserLogin) Login() (loginResult, error) {
 	var fetchedUser UserLogin
+	var result loginResult
 	var err error
 
 	query := "SELECT user_id, email, password FROM users WHERE email = $1"
 	err = config.DB.QueryRow(query, u.Email).Scan(&fetchedUser.ID, &fetchedUser.Email, &fetchedUser.Password)
 	if err != nil {
-		return "", err
+		return loginResult{}, err
 	}
 
-	err = utils.ComparePassword(u.Password, fetchedUser.Password)
+	err = auth.ComparePassword(u.Password, fetchedUser.Password)
 	if err != nil {
-		return "", err
+		return loginResult{}, err
 	}
 
-	newToken, err := utils.GenerateToken(fetchedUser.Email, fetchedUser.ID)
+	result.UserId = fetchedUser.ID
+	result.AccessToken, err = auth.GenerateAccessToken(fetchedUser.Email, fetchedUser.ID)
 	if err != nil {
-		return "", err
+		return loginResult{}, err
 	}
-	fmt.Println(newToken)
+	result.RefreshToken = auth.GenerateRefreshToken()
 
-	return fetchedUser.ID, nil
+	expDays, err := strconv.ParseInt(config.ServerCfg.RefreshExpiryDays, 10, 64)
+	if err != nil {
+		return loginResult{}, err
+	}
+	expDate := time.Now().UTC().AddDate(0, 0, int(expDays))
+	result.RefreshTokenExpDate = expDate
+
+	_, err = auth.PersistRefreshToken(utils.Hash256(result.RefreshToken), fetchedUser.ID, expDate)
+	if err != nil {
+		return loginResult{}, err
+	}
+
+	return result, nil
 }

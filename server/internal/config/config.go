@@ -40,9 +40,10 @@ func (db DBConfig) DBAddress() string {
 }
 
 type ServerConfig struct {
-	Port           string
-	JWTSecret      string
-	JWTExpiryHours string
+	Port              string
+	JWTSecret         string
+	JWTExpiryHours    string
+	RefreshExpiryDays string
 }
 
 var ServerCfg ServerConfig
@@ -72,9 +73,10 @@ func Load() (*Config, error) {
 			SSLMode:  os.Getenv("DB_SSLMODE"),
 		},
 		Server: ServerConfig{
-			Port:           os.Getenv("SERVER_PORT"),
-			JWTSecret:      os.Getenv("SERVER_JWT_SECRET"),
-			JWTExpiryHours: os.Getenv("SERVER_JWT_EXPIRY_HOURS"),
+			Port:              os.Getenv("SERVER_PORT"),
+			JWTSecret:         os.Getenv("SERVER_JWT_SECRET"),
+			JWTExpiryHours:    os.Getenv("SERVER_JWT_EXPIRY_HOURS"),
+			RefreshExpiryDays: os.Getenv("SERVER_REFRESH_TOKEN_EXPIRY_DAYS"),
 		},
 	}
 
@@ -91,7 +93,9 @@ func Load() (*Config, error) {
 	if cfg.Server.JWTExpiryHours == "" {
 		cfg.Server.JWTExpiryHours = "0.25"
 	}
-
+	if cfg.Server.RefreshExpiryDays == "" {
+		cfg.Server.RefreshExpiryDays = "30"
+	}
 	if err := cfg.validate(); err != nil {
 		return nil, err
 	}
