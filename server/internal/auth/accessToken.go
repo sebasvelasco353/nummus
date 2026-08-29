@@ -1,7 +1,6 @@
-package utils
+package auth
 
 import (
-	"crypto/rand"
 	"strconv"
 	"time"
 
@@ -18,17 +17,7 @@ func GenerateAccessToken(email string, userId string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":  email,
 		"userId": userId,
-		"exp":    time.Now().Add(time.Hour * time.Duration(expHours)),
+		"exp":    jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(expHours))),
 	})
 	return token.SignedString([]byte(config.ServerCfg.JWTSecret))
-}
-
-// creates a new random string with high entropy
-func GenerateRefreshToken() string {
-	return rand.Text()
-}
-
-// TODO: Add token validation utility
-func ValidateToken(token string) (bool, error) {
-	return false, nil
 }

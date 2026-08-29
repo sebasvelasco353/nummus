@@ -2,6 +2,7 @@ package users
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,7 +32,6 @@ func signUp(context *gin.Context) {
 }
 
 func login(context *gin.Context) {
-	// TODO: Add JWT token generation functionality
 	var user UserLogin
 
 	if err := context.ShouldBindJSON(&user); err != nil {
@@ -48,8 +48,19 @@ func login(context *gin.Context) {
 		return
 	}
 
+	/* TODO: domain="localhost" hardcoded — this works for local testing, but will fail when this deploys somewhere with a real domain. already have cfg.IsDevelopment() in config.go how can i implement this functionality? - Do we really need it? this will be self hosted :V
+	 */
+	/* TODO: secure=false — this needs to flip to true once we're serving over HTTPS
+	 */
+
+	context.SetCookie("nummus", result.RefreshToken, int(time.Until(result.RefreshTokenExpDate).Seconds()), "/refresh", "localhost", false, true)
+
 	context.JSON(200, gin.H{
-		"message": "Success, user logged in with ID: " + result,
+		"message": "Success, user logged in with ID: " + result.UserId,
+		"result": gin.H{
+			"userID":      result.UserId,
+			"accessToken": result.AccessToken,
+		},
 	})
 }
 
