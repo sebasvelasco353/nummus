@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"crypto/rand"
 	"strconv"
 	"time"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/sebasvelasco353/nummus/server/internal/config"
 )
 
-func GenerateToken(email string, userId string) (string, error) {
+func GenerateAccessToken(email string, userId string) (string, error) {
 	expHours, err := strconv.ParseInt(config.ServerCfg.JWTExpiryHours, 10, 64)
 	if err != nil {
 		return "", err
@@ -21,12 +22,11 @@ func GenerateToken(email string, userId string) (string, error) {
 	return token.SignedString([]byte(config.ServerCfg.JWTSecret))
 }
 
+func GenerateRefreshToken() string {
+	return rand.Text()
+}
+
 // TODO: Add token validation utility
 func ValidateToken(token string) (bool, error) {
 	return false, nil
-}
-
-// TODO: Add Token refresh utility
-func RefreshToken(token string) (string, error) {
-	return "", nil
 }

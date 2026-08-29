@@ -53,7 +53,7 @@ func (u UserLogin) Login() (string, error) {
 		return "", err
 	}
 
-	newToken, err := utils.GenerateToken(fetchedUser.Email, fetchedUser.ID)
+	newToken, err := utils.GenerateAccessToken(fetchedUser.Email, fetchedUser.ID)
 	if err != nil {
 		return "", err
 	}
