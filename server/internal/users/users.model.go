@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/sebasvelasco353/nummus/server/internal/auth"
 	"github.com/sebasvelasco353/nummus/server/internal/config"
 	"github.com/sebasvelasco353/nummus/server/internal/utils"
@@ -64,7 +65,18 @@ func (u UserLogin) Login() (loginResult, error) {
 	}
 
 	result.UserId = fetchedUser.ID
-	result.AccessToken, err = auth.GenerateAccessToken(fetchedUser.Email, fetchedUser.ID)
+
+	expHours, err := strconv.ParseInt(config.ServerCfg.JWTExpiryHours, 10, 64)
+	if err != nil {
+		return loginResult{}, err
+	}
+	claims := auth.AccessTokenClaims{
+		Email:  fetchedUser.Email,
+		UserID: fetchedUser.ID,
+		Exp:    jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(expHours))),
+	}
+
+	result.AccessToken, err = auth.GenerateAccessToken(claims)
 	if err != nil {
 		return loginResult{}, err
 	}
