@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sebasvelasco353/nummus/server/internal/auth"
 )
 
 func signUp(context *gin.Context) {
@@ -54,6 +55,8 @@ func login(context *gin.Context) {
 	 */
 
 	context.SetCookie("nummus", result.RefreshToken, int(time.Until(result.RefreshTokenExpDate).Seconds()), "/refresh", "localhost", false, true)
+
+	auth.ValidateAccessToken(result.AccessToken)
 
 	context.JSON(200, gin.H{
 		"message": "Success, user logged in with ID: " + result.UserId,

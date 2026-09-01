@@ -70,11 +70,12 @@ func (u UserLogin) Login() (loginResult, error) {
 	if err != nil {
 		return loginResult{}, err
 	}
+
 	claims := auth.AccessTokenClaims{
 		Email:  fetchedUser.Email,
 		UserID: fetchedUser.ID,
-		Exp:    jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(expHours))),
 	}
+	claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(expHours)))
 
 	result.AccessToken, err = auth.GenerateAccessToken(claims)
 	if err != nil {

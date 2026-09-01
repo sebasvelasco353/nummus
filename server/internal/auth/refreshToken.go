@@ -12,6 +12,7 @@ func GenerateRefreshToken() string {
 	return rand.Text()
 }
 
+// stores a refresh token on the database
 func PersistRefreshToken(token string, userId string, expDate time.Time) (string, error) {
 	var err error
 	var newTokenId string
