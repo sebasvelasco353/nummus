@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sebasvelasco353/nummus/server/internal/auth"
 )
 
 func signUp(context *gin.Context) {
@@ -49,14 +48,8 @@ func login(context *gin.Context) {
 		return
 	}
 
-	/* TODO: domain="localhost" hardcoded — this works for local testing, but will fail when this deploys somewhere with a real domain. already have cfg.IsDevelopment() in config.go how can i implement this functionality? - Do we really need it? this will be self hosted :V
-	 */
-	/* TODO: secure=false — this needs to flip to true once we're serving over HTTPS
-	 */
-
-	context.SetCookie("nummus", result.RefreshToken, int(time.Until(result.RefreshTokenExpDate).Seconds()), "/refresh", "localhost", false, true)
-
-	auth.ValidateAccessToken(result.AccessToken)
+	// TODO: secure=false — this needs to flip to true once we're serving over HTTPS
+	context.SetCookie("nummus", result.RefreshToken, int(time.Until(result.RefreshTokenExpDate).Seconds()), "/refresh", "", false, true)
 
 	context.JSON(200, gin.H{
 		"message": "Success, user logged in with ID: " + result.UserId,
@@ -69,4 +62,11 @@ func login(context *gin.Context) {
 
 func refresh(context *gin.Context) {
 	fmt.Println("Refresh the token")
+}
+
+func getSelf(context *gin.Context) {
+	context.JSON(200, gin.H{
+		"userId": context.MustGet("userId"),
+		"email":  context.MustGet("email"),
+	})
 }
