@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sebasvelasco353/nummus/server/internal/auth"
+	"github.com/sebasvelasco353/nummus/server/internal/utils"
 )
 
 func signUp(context *gin.Context) {
@@ -62,6 +64,22 @@ func login(context *gin.Context) {
 
 func refresh(context *gin.Context) {
 	fmt.Println("Refresh the token")
+	cookie, err := context.Cookie("nummus")
+	if err != nil {
+		context.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	cookie = utils.Hash256(cookie)
+	result, err := auth.FetchRefreshToken(cookie)
+	if err != nil {
+		context.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	fmt.Println(result)
 }
 
 func getSelf(context *gin.Context) {
