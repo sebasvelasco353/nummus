@@ -10,6 +10,7 @@ func RegisterRoutes(server *gin.Engine) {
 	private.Use(middleware.AuthValidator())
 	{
 		private.GET("/me", getSelf)
+		private.GET("/logout", logout)
 	}
 	server.POST("/signup", signUp)
 	server.POST("/login", login)
