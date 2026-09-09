@@ -3,11 +3,14 @@ package auth
 import (
 	"crypto/rand"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/sebasvelasco353/nummus/server/internal/config"
 )
+
+var ErrRefreshTokenNotFound = errors.New("no token found")
 
 type RefreshTokenType struct {
 	RefreshTokenID   string
@@ -55,7 +58,7 @@ func FetchRefreshToken(token string) (RefreshTokenType, error) {
 	err = config.DB.QueryRow(query, token).Scan(&row.RefreshTokenID, &row.RefreshTokenHash, &row.UserID, &row.ExpDate, &row.IsUsed, &row.Email)
 
 	if err == sql.ErrNoRows {
-		return RefreshTokenType{}, fmt.Errorf("no token found")
+		return RefreshTokenType{}, ErrRefreshTokenNotFound
 	} else if err != nil {
 		return RefreshTokenType{}, fmt.Errorf("there was an error while fetching the token from the database")
 	}

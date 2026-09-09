@@ -1,7 +1,7 @@
 package users
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 	"time"
 
@@ -53,7 +53,7 @@ func login(context *gin.Context) {
 	}
 
 	// TODO: secure=false — this needs to flip to true once we're serving over HTTPS
-	context.SetCookie("nummus", result.RefreshToken, int(time.Until(result.RefreshTokenExpDate).Seconds()), "/refresh", "", false, true)
+	context.SetCookie("nummus", result.RefreshToken, int(time.Until(result.RefreshTokenExpDate).Seconds()), "/auth", "", false, true)
 
 	context.JSON(200, gin.H{
 		"message": "Success, user logged in with ID: " + result.UserId,
@@ -64,13 +64,53 @@ func login(context *gin.Context) {
 	})
 }
 
-// TODO: logout functionality
 func logout(context *gin.Context) {
-	fmt.Println("Logout the user!")
+	cookie, err := context.Cookie("nummus")
+	if err != nil {
+		context.JSON(401, gin.H{
+			"error": err.Error(),
+			"code":  "session_compromised",
+		})
+		return
+	}
+
+	cookie = utils.Hash256(cookie)
+	result, err := auth.FetchRefreshToken(cookie)
+	if errors.Is(err, auth.ErrRefreshTokenNotFound) {
+		context.SetCookie("nummus", "", -1, "/auth", "", false, true)
+		context.JSON(200, gin.H{
+			"message": "Success, user logged out",
+			"result": gin.H{
+				"accessToken": "",
+			},
+		})
+		return
+	}
+	if err != nil {
+		context.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	err = auth.RevokeSingleRefreshToken(result.RefreshTokenID)
+	if err != nil {
+		context.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	context.SetCookie("nummus", "", -1, "/auth", "", false, true)
+
+	context.JSON(200, gin.H{
+		"message": "Success, user logged out",
+		"result": gin.H{
+			"accessToken": "",
+		},
+	})
+
 }
 
 func refresh(context *gin.Context) {
-	fmt.Println("Refresh the token")
 	cookie, err := context.Cookie("nummus")
 	if err != nil {
 		context.JSON(401, gin.H{
@@ -82,7 +122,7 @@ func refresh(context *gin.Context) {
 	cookie = utils.Hash256(cookie)
 	result, err := auth.FetchRefreshToken(cookie)
 	if err != nil {
-		context.SetCookie("nummus", "", -1, "/refresh", "", false, true)
+		context.SetCookie("nummus", "", -1, "/auth", "", false, true)
 		context.JSON(401, gin.H{
 			"error": err.Error(),
 			"code":  "session_compromised",
@@ -99,14 +139,14 @@ func refresh(context *gin.Context) {
 			})
 			return
 		}
-		context.SetCookie("nummus", "", -1, "/refresh", "", false, true)
+		context.SetCookie("nummus", "", -1, "/auth", "", false, true)
 		context.JSON(401, gin.H{
 			"error": "session has been compromised, self destruct initiated.",
 			"code":  "session_compromised",
 		})
 		return
 	} else if result.ExpDate.Before(time.Now()) {
-		context.SetCookie("nummus", "", -1, "/refresh", "", false, true)
+		context.SetCookie("nummus", "", -1, "/auth", "", false, true)
 		context.JSON(401, gin.H{
 			"error": "session has expired, log in again.",
 			"code":  "session_expired",
@@ -163,7 +203,7 @@ func refresh(context *gin.Context) {
 			return
 		}
 
-		context.SetCookie("nummus", refreshToken, int(time.Until(refreshTokenExpDate).Seconds()), "/refresh", "", false, true)
+		context.SetCookie("nummus", refreshToken, int(time.Until(refreshTokenExpDate).Seconds()), "/auth", "", false, true)
 
 		context.JSON(200, gin.H{
 			"message": "Success, user refreshed their tokens",

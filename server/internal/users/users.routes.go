@@ -10,9 +10,12 @@ func RegisterRoutes(server *gin.Engine) {
 	private.Use(middleware.AuthValidator())
 	{
 		private.GET("/me", getSelf)
-		private.GET("/logout", logout)
+	}
+	authGroup := server.Group("/auth")
+	{
+		authGroup.POST("/refresh", refresh)
+		authGroup.POST("/logout", logout)
 	}
 	server.POST("/signup", signUp)
 	server.POST("/login", login)
-	server.POST("/refresh", refresh)
 }
