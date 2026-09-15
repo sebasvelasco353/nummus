@@ -57,7 +57,7 @@ func login(context *gin.Context) {
 
 	context.JSON(200, gin.H{
 		"message": "Success, user logged in with ID: " + result.UserId,
-		"result": gin.H{
+		"data": gin.H{
 			"userID":      result.UserId,
 			"accessToken": result.AccessToken,
 		},
@@ -80,7 +80,7 @@ func logout(context *gin.Context) {
 		context.SetCookie("nummus", "", -1, "/auth", "", false, true)
 		context.JSON(200, gin.H{
 			"message": "Success, user logged out",
-			"result": gin.H{
+			"data": gin.H{
 				"accessToken": "",
 			},
 		})
@@ -103,7 +103,7 @@ func logout(context *gin.Context) {
 
 	context.JSON(200, gin.H{
 		"message": "Success, user logged out",
-		"result": gin.H{
+		"data": gin.H{
 			"accessToken": "",
 		},
 	})
@@ -207,7 +207,7 @@ func refresh(context *gin.Context) {
 
 		context.JSON(200, gin.H{
 			"message": "Success, user refreshed their tokens",
-			"result": gin.H{
+			"data": gin.H{
 				"userID":      result.UserID,
 				"accessToken": accessToken,
 			},
@@ -217,7 +217,9 @@ func refresh(context *gin.Context) {
 
 func getSelf(context *gin.Context) {
 	context.JSON(200, gin.H{
-		"userId": context.MustGet("userId"),
-		"email":  context.MustGet("email"),
+		"data": gin.H{
+			"userId": context.MustGet("userId"),
+			"email":  context.MustGet("email"),
+		},
 	})
 }
