@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sebasvelasco353/nummus/server/internal/accounts"
 	"github.com/sebasvelasco353/nummus/server/internal/config"
 	"github.com/sebasvelasco353/nummus/server/internal/users"
 )
@@ -25,6 +26,7 @@ func main() {
 
 	server := gin.Default()
 	users.RegisterRoutes(server)
+	accounts.RegisterRoutes(server)
 
 	server.Run(":" + cfg.Server.Port)
 }

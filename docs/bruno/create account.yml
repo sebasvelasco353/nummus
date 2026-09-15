@@ -1,0 +1,27 @@
+info:
+  name: create account
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: http://localhost:8080/accounts
+  body:
+    type: json
+    data: |-
+      {
+        "bank": "Banco el bolsillo",
+        "name": "pal mecato",
+        "balance": 1234567890,
+        "currency": "Euro"
+      }
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
