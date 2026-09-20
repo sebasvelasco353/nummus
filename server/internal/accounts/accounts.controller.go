@@ -30,7 +30,14 @@ func createAccount(context *gin.Context) {
 	ownerId := context.MustGet("userId")
 	account.Owner = ownerId.(string)
 
-	context.JSON(200, gin.H{
+	resultId, err := account.CreateAccount()
+	if err != nil {
+		handleErrors(context, err)
+		return
+	}
+
+	account.AccountId = resultId
+	context.JSON(201, gin.H{
 		"success": true,
 		"data":    account,
 	})
