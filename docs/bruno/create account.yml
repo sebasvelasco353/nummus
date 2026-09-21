@@ -12,8 +12,9 @@ http:
       {
         "bank": "Banco el bolsillo",
         "name": "pal mecato",
-        "balance": 1234567890,
-        "currency": "Euro"
+        "balance": 0,
+        "currency": "Euro",
+        "accountType": "savings"
       }
   auth:
     type: bearer
