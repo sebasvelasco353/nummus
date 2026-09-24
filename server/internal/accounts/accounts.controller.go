@@ -5,11 +5,20 @@ import (
 )
 
 func getAccounts(context *gin.Context) {
+	ownerId := context.MustGet("userId").(string)
+
+	result, err := GetAccounts(ownerId)
+	if err != nil {
+		handleErrors(context, err)
+		return
+	}
+
 	context.JSON(200, gin.H{
 		"success": true,
-		"data":    nil,
+		"data":    result,
 	})
 }
+
 func getAccount(context *gin.Context) {
 	accountId := context.Param("id")
 	ownerId := context.MustGet("userId").(string)

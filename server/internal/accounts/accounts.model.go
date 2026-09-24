@@ -36,3 +36,30 @@ func GetAccount(accountId string, userId string) (Account, error) {
 
 	return account, err
 }
+
+func GetAccounts(userId string) ([]Account, error) {
+	var accounts []Account
+
+	query := "SELECT account_id, owner, bank, name, balance, currency, account_type FROM accounts WHERE owner = $1"
+	rows, err := config.DB.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var account Account
+		if err := rows.Scan(&account.AccountId, &account.Owner, &account.Bank, &account.Name, &account.Balance, &account.Currency, &account.AccountType); err != nil {
+			return nil, err
+		}
+		accounts = append(accounts, account)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if len(accounts) == 0 {
+		accounts = make([]Account, 0)
+	}
+	return accounts, nil
+}
