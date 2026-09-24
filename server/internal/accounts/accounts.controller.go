@@ -64,9 +64,28 @@ func createAccount(context *gin.Context) {
 }
 
 func updateAccount(context *gin.Context) {
+	var newData UpdateAccountData
+	var err error
+
+	owner := context.MustGet("userId").(string)
+	accountId := context.Param("id")
+
+	if err = context.ShouldBindBodyWithJSON(&newData); err != nil {
+		context.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	updatedAccount, err := newData.UpdateAccount(owner, accountId)
+	if err != nil {
+		handleErrors(context, err)
+		return
+	}
+
 	context.JSON(200, gin.H{
 		"success": true,
-		"data":    nil,
+		"data":    updatedAccount,
 	})
 }
 

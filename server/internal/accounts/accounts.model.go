@@ -13,6 +13,11 @@ type Account struct {
 	Currency    string `binding:"required"`
 	AccountType string `binding:"required,oneof=savings debit credit"`
 }
+type UpdateAccountData struct {
+	Name        string `binding:"required"`
+	Currency    string `binding:"required"`
+	AccountType string `binding:"required,oneof=savings debit credit"`
+}
 
 func (a Account) CreateAccount() (string, error) {
 	var err error
@@ -25,6 +30,18 @@ func (a Account) CreateAccount() (string, error) {
 	}
 	a.AccountId = accountId
 	return a.AccountId, nil
+}
+
+func (a UpdateAccountData) UpdateAccount(owner string, accountId string) (Account, error) {
+	var err error
+	var updatedAccount Account
+
+	query := "UPDATE accounts SET name = $1, currency = $2, account_type = $3 WHERE owner = $4 AND account_id = $5 RETURNING account_id, owner, bank, name, balance, currency, account_type"
+	err = config.DB.QueryRow(query, a.Name, a.Currency, a.AccountType, owner, accountId).Scan(&updatedAccount.AccountId, &updatedAccount.Owner, &updatedAccount.Bank, &updatedAccount.Name, &updatedAccount.Balance, &updatedAccount.Currency, &updatedAccount.AccountType)
+	if err != nil {
+		return Account{}, err
+	}
+	return updatedAccount, nil
 }
 
 func DeleteAccount(accountId string, userId string) (int64, error) {
