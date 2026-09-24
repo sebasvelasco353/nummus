@@ -22,6 +22,7 @@ func handleErrors(context *gin.Context, err error) {
 		return
 	}
 
+	logger.Error("Request failed", "method", context.Request.Method, "path", context.FullPath(), "error", err.Error())
 	var errCode *pq.Error
 	if errors.As(err, &errCode) {
 		if errCode.Code.Name() == "foreign_key_violation" {
@@ -38,7 +39,6 @@ func handleErrors(context *gin.Context, err error) {
 		}
 	}
 
-	logger.Error("Request failed", "method", context.Request.Method, "path", context.FullPath(), "error", err.Error())
 	context.JSON(500, gin.H{
 		"error": "there was an unexpected error",
 	})
