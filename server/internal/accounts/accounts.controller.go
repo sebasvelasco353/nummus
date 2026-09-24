@@ -1,6 +1,8 @@
 package accounts
 
 import (
+	"database/sql"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -69,8 +71,17 @@ func updateAccount(context *gin.Context) {
 }
 
 func deleteAccount(context *gin.Context) {
-	context.JSON(200, gin.H{
-		"success": true,
-		"data":    nil,
-	})
+	accountId := context.Param("id")
+	ownerId := context.MustGet("userId").(string)
+
+	affectedRows, err := DeleteAccount(accountId, ownerId)
+	if err != nil {
+		handleErrors(context, err)
+		return
+	}
+	if affectedRows == 0 {
+		handleErrors(context, sql.ErrNoRows)
+		return
+	}
+	context.Status(204)
 }

@@ -27,6 +27,19 @@ func (a Account) CreateAccount() (string, error) {
 	return a.AccountId, nil
 }
 
+func DeleteAccount(accountId string, userId string) (int64, error) {
+	query := "DELETE FROM accounts WHERE account_id = $1 AND owner = $2"
+	res, err := config.DB.Exec(query, accountId, userId)
+	if err != nil {
+		return 0, err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 func GetAccount(accountId string, userId string) (Account, error) {
 	var account Account
 	var err error
