@@ -1,0 +1,26 @@
+info:
+  name: update account
+  type: http
+  seq: 10
+
+http:
+  method: PUT
+  url: http://localhost:8080/accounts/ebc8920b-a015-4431-8239-d6239f474419
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Ahorrando ando",
+        "currency": "dollars",
+        "accountType": "savings"
+      }
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

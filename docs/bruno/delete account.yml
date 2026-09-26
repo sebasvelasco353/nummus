@@ -1,0 +1,18 @@
+info:
+  name: delete account
+  type: http
+  seq: 9
+
+http:
+  method: DELETE
+  url: http://localhost:8080/accounts/f29eccfb-b54a-423b-b7da-b72c35043a34
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

@@ -1,0 +1,18 @@
+info:
+  name: Get account
+  type: http
+  seq: 7
+
+http:
+  method: GET
+  url: http://localhost:8080/accounts/13c0cfb8-ed2b-4b1b-b04b-e8be4e837d44
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
