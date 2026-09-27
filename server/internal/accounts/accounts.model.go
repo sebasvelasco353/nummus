@@ -19,7 +19,7 @@ type UpdateAccountData struct {
 	AccountType string `binding:"required,oneof=savings debit credit"`
 }
 
-func (a Account) CreateAccount() (string, error) {
+func (a Account) insert() (string, error) {
 	var err error
 	var accountId string
 
@@ -28,25 +28,24 @@ func (a Account) CreateAccount() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	a.AccountId = accountId
-	return a.AccountId, nil
+	return accountId, nil
 }
 
-func (a UpdateAccountData) UpdateAccount(owner string, accountId string) (Account, error) {
+func updateDetails(accountId string, owner string, newData UpdateAccountData) (Account, error) {
 	var err error
 	var updatedAccount Account
 
 	query := "UPDATE accounts SET name = $1, currency = $2, account_type = $3 WHERE owner = $4 AND account_id = $5 RETURNING account_id, owner, bank, name, balance, currency, account_type"
-	err = config.DB.QueryRow(query, a.Name, a.Currency, a.AccountType, owner, accountId).Scan(&updatedAccount.AccountId, &updatedAccount.Owner, &updatedAccount.Bank, &updatedAccount.Name, &updatedAccount.Balance, &updatedAccount.Currency, &updatedAccount.AccountType)
+	err = config.DB.QueryRow(query, newData.Name, newData.Currency, newData.AccountType, owner, accountId).Scan(&updatedAccount.AccountId, &updatedAccount.Owner, &updatedAccount.Bank, &updatedAccount.Name, &updatedAccount.Balance, &updatedAccount.Currency, &updatedAccount.AccountType)
 	if err != nil {
 		return Account{}, err
 	}
 	return updatedAccount, nil
 }
 
-func DeleteAccount(accountId string, userId string) (int64, error) {
+func deleteOne(accountId string, owner string) (int64, error) {
 	query := "DELETE FROM accounts WHERE account_id = $1 AND owner = $2"
-	res, err := config.DB.Exec(query, accountId, userId)
+	res, err := config.DB.Exec(query, accountId, owner)
 	if err != nil {
 		return 0, err
 	}
@@ -57,21 +56,21 @@ func DeleteAccount(accountId string, userId string) (int64, error) {
 	return count, nil
 }
 
-func GetAccount(accountId string, userId string) (Account, error) {
+func GetOneByOwner(accountId string, owner string) (Account, error) {
 	var account Account
 	var err error
 
 	query := "SELECT account_id, owner, bank, name, balance, currency, account_type FROM accounts WHERE account_id = $1 AND owner = $2"
-	err = config.DB.QueryRow(query, accountId, userId).Scan(&account.AccountId, &account.Owner, &account.Bank, &account.Name, &account.Balance, &account.Currency, &account.AccountType)
+	err = config.DB.QueryRow(query, accountId, owner).Scan(&account.AccountId, &account.Owner, &account.Bank, &account.Name, &account.Balance, &account.Currency, &account.AccountType)
 
 	return account, err
 }
 
-func GetAccounts(userId string) ([]Account, error) {
+func GetAllByOwner(owner string) ([]Account, error) {
 	var accounts []Account
 
 	query := "SELECT account_id, owner, bank, name, balance, currency, account_type FROM accounts WHERE owner = $1"
-	rows, err := config.DB.Query(query, userId)
+	rows, err := config.DB.Query(query, owner)
 	if err != nil {
 		return nil, err
 	}

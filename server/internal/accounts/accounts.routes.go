@@ -9,10 +9,10 @@ func RegisterRoutes(server *gin.Engine) {
 	var accounts = server.Group("/accounts")
 	accounts.Use(middleware.AuthValidator())
 	{
-		accounts.GET("", getAccounts)
-		accounts.GET("/:id", getAccount)
-		accounts.POST("", createAccount)
-		accounts.PUT("/:id", updateAccount)
-		accounts.DELETE("/:id", deleteAccount)
+		accounts.GET("", handleGetAll)
+		accounts.GET("/:id", handleGetOne)
+		accounts.POST("", handleCreate)
+		accounts.PUT("/:id", handleUpdate)
+		accounts.DELETE("/:id", handleDelete)
 	}
 }
