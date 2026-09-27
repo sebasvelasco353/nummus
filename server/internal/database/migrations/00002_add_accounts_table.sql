@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS accounts (
   name TEXT NOT NULL,
   balance BIGINT NOT NULL,
   currency TEXT NOT NULL,
-  account_type account_types NOT NULL
+  account_type account_types NOT NULL,
+  --- Redundant with the primary key, but required as the target of transactions' (account, owner) foreign key
+  UNIQUE (account_id, owner)
 );
 
 -- +goose Down
