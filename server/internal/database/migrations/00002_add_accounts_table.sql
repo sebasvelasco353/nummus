@@ -3,10 +3,10 @@ CREATE TYPE account_types AS ENUM ('savings', 'debit', 'credit');
 
 CREATE TABLE IF NOT EXISTS accounts (
   account_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  owner UUID REFERENCES users(user_id) ON DELETE CASCADE NOT NULL,
+  owner UUID REFERENCES users(user_id) NOT NULL,
   bank TEXT NOT NULL,
   name TEXT NOT NULL,
-  balance INTEGER NOT NULL,
+  balance BIGINT NOT NULL,
   currency TEXT NOT NULL,
   account_type account_types NOT NULL
 );
