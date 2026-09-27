@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getAccounts(context *gin.Context) {
+func handleGetAll(context *gin.Context) {
 	ownerId := context.MustGet("userId").(string)
 
-	result, err := GetAccounts(ownerId)
+	result, err := GetAllByOwner(ownerId)
 	if err != nil {
 		handleErrors(context, err)
 		return
@@ -21,11 +21,11 @@ func getAccounts(context *gin.Context) {
 	})
 }
 
-func getAccount(context *gin.Context) {
+func handleGetOne(context *gin.Context) {
 	accountId := context.Param("id")
 	ownerId := context.MustGet("userId").(string)
 
-	result, err := GetAccount(accountId, ownerId)
+	result, err := GetOneByOwner(accountId, ownerId)
 	if err != nil {
 		handleErrors(context, err)
 		return
@@ -37,7 +37,7 @@ func getAccount(context *gin.Context) {
 	})
 }
 
-func createAccount(context *gin.Context) {
+func handleCreate(context *gin.Context) {
 	var account Account
 
 	if err := context.ShouldBindBodyWithJSON(&account); err != nil {
@@ -50,7 +50,7 @@ func createAccount(context *gin.Context) {
 	ownerId := context.MustGet("userId")
 	account.Owner = ownerId.(string)
 
-	resultId, err := account.CreateAccount()
+	resultId, err := account.insert()
 	if err != nil {
 		handleErrors(context, err)
 		return
@@ -63,11 +63,11 @@ func createAccount(context *gin.Context) {
 	})
 }
 
-func updateAccount(context *gin.Context) {
+func handleUpdate(context *gin.Context) {
 	var newData UpdateAccountData
 	var err error
 
-	owner := context.MustGet("userId").(string)
+	ownerId := context.MustGet("userId").(string)
 	accountId := context.Param("id")
 
 	if err = context.ShouldBindBodyWithJSON(&newData); err != nil {
@@ -77,7 +77,7 @@ func updateAccount(context *gin.Context) {
 		return
 	}
 
-	updatedAccount, err := newData.UpdateAccount(owner, accountId)
+	updatedAccount, err := updateDetails(accountId, ownerId, newData)
 	if err != nil {
 		handleErrors(context, err)
 		return
@@ -89,11 +89,11 @@ func updateAccount(context *gin.Context) {
 	})
 }
 
-func deleteAccount(context *gin.Context) {
+func handleDelete(context *gin.Context) {
 	accountId := context.Param("id")
 	ownerId := context.MustGet("userId").(string)
 
-	affectedRows, err := DeleteAccount(accountId, ownerId)
+	affectedRows, err := deleteOne(accountId, ownerId)
 	if err != nil {
 		handleErrors(context, err)
 		return
