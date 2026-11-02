@@ -9,7 +9,7 @@ type Account struct {
 	Owner       string
 	Bank        string `binding:"required"`
 	Name        string `binding:"required"`
-	Balance     int
+	Balance     int64
 	Currency    string `binding:"required"`
 	AccountType string `binding:"required,oneof=savings debit credit"`
 }

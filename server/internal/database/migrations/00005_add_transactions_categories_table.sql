@@ -10,4 +10,3 @@ CREATE INDEX IF NOT EXISTS idx_trans_cat_category_id ON transactions_categories(
 
 -- +goose Down
 DROP TABLE IF EXISTS transactions_categories;
-
